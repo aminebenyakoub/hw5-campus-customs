@@ -1,0 +1,19 @@
+# secrets: never commit the real key
+.env
+frontend/.env
+
+# local environments and builds
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+dist/
+*.tsbuildinfo
+
+# machine / editor files
+.DS_Store
+.claude/
+output/audit_trail.json.tmp
+
+# course hand-out archive (its contents are in data/)
+data.zip

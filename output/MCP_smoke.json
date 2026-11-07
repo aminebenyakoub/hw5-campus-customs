@@ -1,0 +1,46 @@
+{
+  "server": "campus-customs",
+  "connection": ".mcp.json (stdio: .venv/bin/python MCP_server/server.py)",
+  "client": "Claude Code (VibeCoder), tools called as mcp__campus-customs__<tool>",
+  "database": "data/campus_customs_new.db",
+  "tested_on": "2026-11-06",
+  "tests": [
+    {
+      "ticket": 101,
+      "prompt": "Ticket 101: Tauhid Zaman wants one Classic Bulldog Tee (CC-TEE-WHITE) in size S. Use the campus-customs MCP server to check whether we have it in stock.",
+      "tool": "check_stock",
+      "arguments": {"sku": "CC-TEE-WHITE", "size": "S"},
+      "output": {"found": true, "sku": "CC-TEE-WHITE", "name": "Classic Bulldog Tee", "size": "S", "qty": 0, "location": "Aisle B", "in_stock": false},
+      "db_check": {
+        "query": "SELECT * FROM inventory WHERE sku='CC-TEE-WHITE' AND size='S'",
+        "row": {"sku": "CC-TEE-WHITE", "name": "Classic Bulldog Tee", "size": "S", "qty": 0, "location": "Aisle B"},
+        "match": true
+      }
+    },
+    {
+      "ticket": 102,
+      "prompt": "Ticket 102: Elm City Properties emailed that rent is due in 2 days. Use the campus-customs MCP server to look up lease 1 and confirm the amount, landlord and due date.",
+      "tool": "get_lease_rent_due",
+      "arguments": {"lease_id": 1},
+      "output": {"found": true, "id": 1, "space_name": "Chapel Street shop", "landlord": "Elm City Properties", "monthly_rent": 2400, "next_due": "2026-09-02", "notes": null, "date_today": "2026-08-31", "days_until_due": 2, "overdue": false},
+      "db_check": {
+        "query": "SELECT l.*, d.date_today, CAST(julianday(l.next_due)-julianday(d.date_today) AS INT) AS days FROM leases l, desk d WHERE l.id=1",
+        "row": {"id": 1, "space_name": "Chapel Street shop", "landlord": "Elm City Properties", "monthly_rent": 2400.0, "next_due": "2026-09-02", "notes": null, "date_today": "2026-08-31", "days": 2},
+        "match": true
+      }
+    },
+    {
+      "ticket": 103,
+      "prompt": "Ticket 103: Yale AI Club wants 20 Basic Hoodies (CC-HOOD-NAVY) at a bulk discount. Use the campus-customs MCP server to get the hoodie's cost, list price and margin.",
+      "tool": "get_sku_pricing",
+      "arguments": {"sku": "CC-HOOD-NAVY"},
+      "output": {"found": true, "sku": "CC-HOOD-NAVY", "unit_cost": 22, "list_price": 58, "margin_per_unit": 36, "margin_pct_of_price": 62.1},
+      "db_check": {
+        "query": "SELECT * FROM pricing WHERE sku='CC-HOOD-NAVY'",
+        "row": {"sku": "CC-HOOD-NAVY", "unit_cost": 22.0, "list_price": 58.0},
+        "derived": "margin = 58 - 22 = 36; 36 / 58 = 62.1%",
+        "match": true
+      }
+    }
+  ]
+}
